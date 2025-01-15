@@ -3,7 +3,7 @@
 }
 
 .edit-button {
-  background-color: #6d498f;
+  background-color: #502d18;
   color: white;
   padding: 8px 12px;
   border: none;
@@ -14,4 +14,5 @@
 
 .edit-button:hover {
   background-color: #543f7e;
+  transition: 1s ease;
 }

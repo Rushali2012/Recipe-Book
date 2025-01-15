@@ -211,6 +211,8 @@ function App() {
         />
       </div>
 
+      {/* navigate between pages */}
+
       <Routes>
         <Route
           path="/"
