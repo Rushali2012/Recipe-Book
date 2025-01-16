@@ -25,11 +25,11 @@ const RecipeDetails = ({ recipes }) => {
           ))}
         </ul>
         <h3>Preparation Steps:</h3>
-        <ol>
+        <ul>
           {recipe.steps.map((step, index) => (
             <li key={index}>{step}</li>
           ))}
-        </ol>
+        </ul>
       </div>
     </div>
   );

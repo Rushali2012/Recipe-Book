@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Routes, Route, Link, useNavigate } from "react-router-dom";  // Correctly importing useNavigate
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import RecipeList from "./components/RecipeList";
 import RecipeDetails from "./components/RecipeDetails";
 import AddRecipe from "./components/AddRecipe";
+import SignIn from "./components/SignIn";
+import Register from "./components/Register";
+
 import "./App.css";
 
 function App() {
@@ -150,41 +153,53 @@ function App() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [editRecipe, setEditRecipe] = useState(null);
-  const navigate = useNavigate();  
+  const [userType, setUserType] = useState("");
+  const navigate = useNavigate();
 
   const filteredRecipes = recipes.filter((recipe) => {
     const searchInTitle = recipe.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    const searchInIngredients = recipe.ingredients.some((ingredient) =>
-      ingredient.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    return searchInTitle || searchInIngredients;
+    
+    
+    return searchInTitle ;
   });
 
   const addRecipe = (newRecipe) => {
-    if (editRecipe) {
-      setRecipes(
-        recipes.map((recipe) =>
-        recipe.id === editRecipe.id
-      ? { ...newRecipe, id: editRecipe.id }
-                : recipe
-        )
-      );
+    if (userType === "host") {
+      if (editRecipe) {
+        setRecipes(
+          recipes.map((recipe) =>
+            recipe.id === editRecipe.id
+              ? { ...newRecipe, id: editRecipe.id }
+              : recipe
+          )
+        );
+      } else {
+        setRecipes((prevRecipes) => [
+          ...prevRecipes,
+          { ...newRecipe, id: prevRecipes.length + 1 },
+        ]);
+      }
+      setEditRecipe(null);
+      navigate("/");
     } else {
-      setRecipes((prevRecipes) => [
-        ...prevRecipes,
-        { ...newRecipe, id: prevRecipes.length + 1 },
-      ]);
+      alert("Only hosts can add recipes.");
     }
-    setEditRecipe(null);
-    navigate("/"); 
   };
 
   const handleEditClick = (recipe) => {
-    setEditRecipe(recipe); 
-    navigate("/add-recipe"); 
+    if (userType === "host") {
+      setEditRecipe(recipe);
+      navigate("/add-recipe");
+    } else {
+      alert("Only hosts can edit recipes.");
+    }
   };
+
+  // const handleUserType = (type) => {
+  //   setUserType(type);
+  // };
 
   return (
     <div className="app-container">
@@ -198,34 +213,43 @@ function App() {
             <li>
               <Link to="/add-recipe">Add Recipe</Link>
             </li>
+            <li>
+              <Link to="/signin">Sign In</Link>
+            </li>
+            <li>
+              <Link to="/register">Register</Link>
+            </li>
           </ul>
         </nav>
       </header>
 
+      <Routes>
+      <Route 
+  path="/" 
+  element={
+    <div>
       <div className="search-bar">
         <input
           type="text"
-            placeholder="Search recipes by title, description, or ingredients"
-        value={searchTerm}
+          placeholder="Search recipes by title"
+          value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
-      {/* navigate between pages */}
-
-      <Routes>
-        <Route
-          path="/"
-          element={<RecipeList recipes={filteredRecipes} onEdit={handleEditClick} />}
-        />
-        <Route
-          path="/recipe/:id"
-          element={<RecipeDetails recipes={recipes} />}
-        />
-        <Route
-          path="/add-recipe"
-          element={<AddRecipe addRecipe={addRecipe} editRecipe={editRecipe} />}
-        />
+      <RecipeList recipes={filteredRecipes} onEdit={handleEditClick} userType={userType} />
+      {userType === "host" && (
+        <Link to="/add-recipe">
+          <button>Add Recipe</button>
+        </Link>
+      )}
+    </div>
+  } 
+/>
+        <Route path="/recipe/:id" element={<RecipeDetails recipes={recipes} />} />
+        <Route path="/add-recipe" element={<AddRecipe addRecipe={addRecipe} editRecipe={editRecipe} userType={userType} />} />
+        <Route path="/signin" element={<SignIn />} />
+<Route path="/register" element={<Register />} />
+<Route path="/add-recipe" element={<AddRecipe addRecipe={addRecipe} editRecipe={editRecipe} userType={userType} />} />
       </Routes>
     </div>
   );
